@@ -25,8 +25,8 @@ def preprocess_product_xml_data(landing_folder, save_folder, run_date_key):
     try:
         name = "product"
         landing_run_date_folder = f"{landing_folder}/{run_date_key}"
-        
-        with open(f"{landing_run_date_folder}/{name}_raw.xml", 'rb') as xml_file:
+
+        with open(f"{landing_run_date_folder}/{name}_raw.xml", "rb") as xml_file:
             xml_data = xml_file.read()
 
         # Parse XML data
@@ -34,30 +34,42 @@ def preprocess_product_xml_data(landing_folder, save_folder, run_date_key):
         root = tree.getroot()
 
         # Define the namespace
-        namespace = {'g': 'http://base.google.com/ns/1.0'}
-        
+        namespace = {"g": "http://base.google.com/ns/1.0"}
+
         data_list = []
-        
+
         # Iterate through XML elements and extract data
-        for item_elem in root.findall('.//channel/item', namespaces=namespace):
+        for item_elem in root.findall(".//channel/item", namespaces=namespace):
             data_dict = {}
             for child_elem in item_elem:
-                col_name = child_elem.tag.replace('{http://base.google.com/ns/1.0}', '')
+                col_name = child_elem.tag.replace("{http://base.google.com/ns/1.0}", "")
                 data_dict[col_name] = child_elem.text
             data_list.append(data_dict)
-        
+
         # Ensure that all dictionaries have the "sale_price" key
         for data_dict in data_list:
-            data_dict.setdefault('sale_price', None)
+            data_dict.setdefault("sale_price", None)
 
-        #Polars Dataframe
-        product_prep = pl.DataFrame(data_list)\
-            .with_columns(pl.col("product_type").str.split(">").alias("product_type_list"))\
-            .with_columns(pl.col("product_type_list").map_elements(lambda lst: lst[0]).alias("product_type_cat"))\
-            .with_columns(pl.col("product_type_list").map_elements(lambda lst: lst[1] if len(lst) > 1 else None).alias("product_type_subcat"))\
-            .with_columns(proc_date_key = pl.lit(run_date_key))
+        # Polars Dataframe
+        product_prep = (
+            pl.DataFrame(data_list)
+            .with_columns(
+                pl.col("product_type").str.split(">").alias("product_type_list")
+            )
+            .with_columns(
+                pl.col("product_type_list")
+                .map_elements(lambda lst: lst[0])
+                .alias("product_type_cat")
+            )
+            .with_columns(
+                pl.col("product_type_list")
+                .map_elements(lambda lst: lst[1] if len(lst) > 1 else None)
+                .alias("product_type_subcat")
+            )
+            .with_columns(proc_date_key=pl.lit(run_date_key))
+        )
 
-        #Save
+        # Save
         save_path = f"{save_folder}/{run_date_key}"
         os.makedirs(save_path, exist_ok=True)
         parquet_file_path = f"{save_path}/{name}_prep.parquet"
@@ -70,6 +82,7 @@ def preprocess_product_xml_data(landing_folder, save_folder, run_date_key):
     except ET.ParseError:
         raise Exception(f"Failed to parse XML file: {landing_run_date_folder}")
 
+
 def main():
     """
     Main function to preprocess product XML data.
@@ -81,10 +94,10 @@ def main():
     Returns:
         None
     """
-    run_date_key = datetime.now(timezone('Europe/Bratislava')).strftime('%Y%m%d')
-    user_folder = "/home/data/"
+    run_date_key = datetime.now(timezone("Europe/Bratislava")).strftime("%Y%m%d")
+    user_folder = "data"
     landing_folder = user_folder + "/web/landing/product_data"
-    save_folder = user_folder + '/web/preprocess/product_data'
+    save_folder = user_folder + "/web/preprocess/product_data"
 
     preprocess_product_xml_data(landing_folder, save_folder, run_date_key)
 
