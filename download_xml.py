@@ -46,7 +46,7 @@ def main():
     run_date_key = datetime.now(timezone('Europe/Bratislava')).strftime('%Y%m%d')
     url = ''
     name = "product"
-    user_folder = "data"
+    user_folder = "/home/data/"
     save_folder =  user_folder + "/web/landing/product_data"
 
     download_xml_data(name, url, save_folder, run_date_key)
