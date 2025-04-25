@@ -82,7 +82,7 @@ def main():
         None
     """
     run_date_key = datetime.now(timezone('Europe/Bratislava')).strftime('%Y%m%d')
-    user_folder = "data"
+    user_folder = "/home/data/"
     landing_folder = user_folder + "/web/landing/product_data"
     save_folder = user_folder + '/web/preprocess/product_data'
 
