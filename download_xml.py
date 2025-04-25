@@ -18,18 +18,19 @@ def download_xml_data(name, url, save_folder, run_date_key):
         None
     """
     response = requests.get(url)
-    
+
     if response.status_code == 200:
         xml_data = response.content
         save_path = f"{save_folder}/{run_date_key}"
         os.makedirs(save_path, exist_ok=True)
-        
-        with open(f"{save_path}/{name}_raw.xml", 'wb') as xml_file:
+
+        with open(f"{save_path}/{name}_raw.xml", "wb") as xml_file:
             xml_file.write(xml_data)
 
         return print(f"{name} LANDING: DONE with date: {run_date_key}")
     else:
         raise Exception(f"Failed to download data. Status code: {response.status_code}")
+
 
 def main():
     """
@@ -43,11 +44,11 @@ def main():
     Returns:
         None
     """
-    run_date_key = datetime.now(timezone('Europe/Bratislava')).strftime('%Y%m%d')
-    url = ''
+    run_date_key = datetime.now(timezone("Europe/Bratislava")).strftime("%Y%m%d")
+    url = ""
     name = "product"
-    user_folder = "/home/data/"
-    save_folder =  user_folder + "/web/landing/product_data"
+    user_folder = "data"
+    save_folder = user_folder + "/web/landing/product_data"
 
     download_xml_data(name, url, save_folder, run_date_key)
 
