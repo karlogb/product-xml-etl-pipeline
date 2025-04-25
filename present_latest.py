@@ -41,7 +41,7 @@ def main():
     Returns:
         None
     """
-    data_path = "data"
+    data_path = "/home/data/"
 
     present_product_xml_data(data_path)
 
